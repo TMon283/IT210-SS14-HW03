@@ -4,9 +4,13 @@ import com.example.ss14hw03.p2.config.HibernateUtils;
 import com.example.ss14hw03.p2.model.Order;
 import com.example.ss14hw03.p2.model.Product;
 import jakarta.persistence.OptimisticLockException;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
+@RequiredArgsConstructor
 public class BuyProduct {
     public void buyProduct(Long productId, Long customerId, int quantity) {
         Session session = HibernateUtils.getSessionFactory().openSession();
