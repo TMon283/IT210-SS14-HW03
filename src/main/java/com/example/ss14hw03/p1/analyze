@@ -1,0 +1,21 @@
+* Phân tích bài toán
+- Input: Khách hàng nhấn 'Mua ngay' cho sản phẩm iPhone15
+- Output:
+    + Nếu còn hàng: Tạo đơn hàng mới, trừ kho
+    + Nếu hết hàng: Thông báo 'Hết hàng'
+    + Không được bán số lượng vượt quá số lượng trong kho
+
+* Giái pháp đề xuất
+- Dùng annotation @Version trong entity Product. Khi nhiều transaction cùng cập nhật,
+Hibernate sẽ kiểm tra version. Nếu version không khớp -> ném OptimisticLockException
+- Dùng LockModeType.PESSIMISTIC_WRITE khi đọc sản phẩm. Điều này sẽ khóa dòng dữ liệu trong DB,
+ngăn transaction khác đọc/ghi cho đến khi transaction hiện tại kết thúc.
+
+* Thiết kế các bước
+    1. Bắt đầu transaction
+    2. Lấy Product với 1 trong 2 cơ chế ở phần giải pháp
+    3. Kiểm tra stock:
+    - Nếu stock < số lượng yêu cầu -> rollback, trả về 'Hết hàng'
+    - Nếu stock đủ -> tạo Order, trừ stock
+    4. Commit Transaction
+    5. Nếu có lỗi -> rollback, trả về 'Hệ thống đang bận, vui lòng thử lại sau'
